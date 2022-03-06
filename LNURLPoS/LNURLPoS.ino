@@ -420,7 +420,7 @@ void displayBatteryVoltage(bool forceUpdate)
     if (showBatteryVoltage)
     {
       tft.setFreeFont(SMALLFONT);
-      tft.setCursor(155, 36);
+      tft.setCursor(145, 36);
       tft.print(String(batteryCurV) + "v");
     }
   }
