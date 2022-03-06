@@ -10,30 +10,34 @@
 #include <WiFi.h>
 #include "esp_adc_cal.h"
 
-//Dario's version
+//Dario's version 0.1
 
 ////////////////////////////////////////////////////////
 ////////CHANGE! USE LNURLPoS EXTENSION IN LNBITS////////
 ////////////////////////////////////////////////////////
 
-String baseURL = "https://legend.lnbits.com/lnurlpos/api/v1/lnurl/UZsLkBSzdDqEFgc3RAs8rj";
-String key = "UzhUjUGFvEtJRaVSpxxNCa";
-String currency = "USD";
+
+//https://infinity.lnbits.com/wallet/gk66udnwfm?key=9f982b4311b3fb836971b9b05e44ae4272c24f3b576b3206924d43597c71bd2e
+//URL to Infinity LNbits
+
+String baseURL = "https://legend.lnbits.com/lnurldevice/api/v1/lnurl/gkLnU8zTqTcKFMg3dajFRt";
+String key = "QbvNgeZx398EFs8dH98eR2";
+String currency = "CHF";
 
 //////////////KEYPAD///////////////////
-bool isLilyGoKeyboard = false;
+bool isLilyGoKeyboard = true;
 
 //////////////SLEEP SETTINGS///////////////////
 bool isSleepEnabled = true;
 int sleepTimer = 30; // Time in seconds before the device goes to sleep
 
 //////////////QR DISPLAY BRIGHTNESS///////////////////
-int qrScreenBrightness = 180; // 0 = min, 255 = max
+int qrScreenBrightness = 120; // 0 = min, 255 = max
 
 //////////////BATTERY///////////////////
-const bool shouldDisplayBatteryLevel = false; // Display the battery level on the display?
-const float batteryMaxVoltage = 4.2;          // The maximum battery voltage. Used for battery percentage calculation
-const float batteryMinVoltage = 3.73;         // The minimum battery voltage that we tolerate before showing the warning
+const bool shouldDisplayBatteryLevel = true; // Display the battery level on the display?
+const float batteryMaxVoltage = 4.5;          // The maximum battery voltage. Used for battery percentage calculation
+const float batteryMinVoltage = 3.7;         // The minimum battery voltage that we tolerate before showing the warning
 
 ////////////////////////////////////////////////////////
 ////Note: See lines 75, 97, to adjust to keypad size////
@@ -87,26 +91,27 @@ uint16_t qrScreenBgColour = tft.color565(qrScreenBrightness, qrScreenBrightness,
 const byte rows = 4; //four rows
 const byte cols = 3; //three columns
 char keys[rows][cols] = {
-    {'1', '2', '3'},
-    {'4', '5', '6'},
-    {'7', '8', '9'},
-    {'*', '0', '#'}};
+  {'1', '2', '3'},
+  {'4', '5', '6'},
+  {'7', '8', '9'},
+  {'*', '0', '#'}
+};
 
 //Big keypad setup
 //byte rowPins[rows] = {12, 13, 15, 2}; //connect to the row pinouts of the keypad
 //byte colPins[cols] = {17, 22, 21}; //connect to the column pinouts of the keypad
 
 //LilyGO T-Display-Keyboard
-//byte rowPins[rows] = {21, 27, 26, 22}; //connect to the row pinouts of the keypad
-//byte colPins[cols] = {33, 32, 25}; //connect to the column pinouts of the keypad
+byte rowPins[rows] = {21, 27, 26, 22}; //connect to the row pinouts of the keypad
+byte colPins[cols] = {33, 32, 25}; //connect to the column pinouts of the keypad
 
 // 4 x 4 keypad setup
 //byte rowPins[rows] = {21, 22, 17, 2}; //connect to the row pinouts of the keypad
 //byte colPins[cols] = {15, 13, 12}; //connect to the column pinouts of the keypad
 
 //Small keypad setup
-byte rowPins[rows] = {21, 22, 17, 2}; //connect to the row pinouts of the keypad
-byte colPins[cols] = {15, 13, 12};    //connect to the column pinouts of the keypad
+//byte rowPins[rows] = {21, 22, 17, 2}; //connect to the row pinouts of the keypad
+//byte colPins[cols] = {15, 13, 12};    //connect to the column pinouts of the keypad
 
 Keypad keypad = Keypad(makeKeymap(keys), rowPins, colPins, rows, cols);
 int checker = 0;
@@ -129,7 +134,8 @@ void setup(void)
   if (bootCount == 0)
   {
     logo();
-    delay(3000);
+//dd    delay(3000);
+        delay(5000);
   }
   else
   {
@@ -280,7 +286,8 @@ void displaySats()
 {
   tft.fillScreen(TFT_BLACK);
   tft.setTextColor(TFT_WHITE, TFT_BLACK); // White characters on black background
-  tft.setFreeFont(MIDFONT);
+  //dd  tft.setFreeFont(MIDFONT);
+  tft.setFreeFont(SMALLFONT);
   tft.setCursor(0, 20);
   tft.println("AMOUNT THEN #");
   tft.setCursor(60, 130);
@@ -317,7 +324,8 @@ void logo()
   tft.setTextColor(TFT_WHITE, TFT_BLACK); // White characters on black background
   tft.setFreeFont(BIGFONT);
   tft.setCursor(7, 70);  // To be compatible with Adafruit_GFX the cursor datum is always bottom left
-  tft.print("LNURLPoS"); // Using tft.print means text background is NEVER rendered
+//dd  tft.print("LNURLPoS"); // Using tft.print means text background is NEVER rendered
+  tft.print("G20_PoS"); // Using tft.print means text background is NEVER rendered
 
   tft.setTextColor(TFT_PURPLE, TFT_BLACK); // White characters on black background
   tft.setFreeFont(SMALLFONT);
@@ -339,16 +347,16 @@ void to_upper(char *arr)
 long lastBatteryUpdate = millis();
 int batteryLevelUpdatePeriod = 10; // update every X seconds
 /**
- * Display the battery voltage
- */
+   Display the battery voltage
+*/
 void displayBatteryVoltage(bool forceUpdate)
 {
   long currentTime = millis();
   if (
-      (shouldDisplayBatteryLevel &&
-       (currentTime > (lastBatteryUpdate + batteryLevelUpdatePeriod * 1000)) &&
-       !isPoweredExternally()) ||
-      (shouldDisplayBatteryLevel && forceUpdate && !isPoweredExternally()))
+    (shouldDisplayBatteryLevel &&
+     (currentTime > (lastBatteryUpdate + batteryLevelUpdatePeriod * 1000)) &&
+     !isPoweredExternally()) ||
+    (shouldDisplayBatteryLevel && forceUpdate && !isPoweredExternally()))
   {
     lastBatteryUpdate = currentTime;
     bool showBatteryVoltage = false;
@@ -356,11 +364,13 @@ void displayBatteryVoltage(bool forceUpdate)
     float batteryAllowedRange = batteryMaxVoltage - batteryMinVoltage;
     float batteryCurVAboveMin = batteryCurV - batteryMinVoltage;
 
-    int batteryPercentage = (int)(batteryCurVAboveMin / batteryAllowedRange * 100);
+    //dd int batteryPercentage = (int)(batteryCurVAboveMin / batteryAllowedRange * 100);
+    int batteryPercentage = (int)(batteryCurV * 100);
 
     if (batteryPercentage > 100)
     {
-      batteryPercentage = 100;
+      //dd      batteryPercentage = 100;
+      batteryPercentage = batteryPercentage;
     }
 
     int textColour = TFT_GREEN;
@@ -388,7 +398,7 @@ void displayBatteryVoltage(bool forceUpdate)
 
     // Clear the area of the display where the battery level is shown
     tft.fillRect(textXPos - 2, 0, 50, 20, TFT_BLACK);
-    tft.setCursor(textXPos, 16);
+        tft.setCursor(textXPos, 16);
 
     // Is the device charging?
     if (isPoweredExternally())
@@ -398,11 +408,13 @@ void displayBatteryVoltage(bool forceUpdate)
     // Show the current voltage
     if (batteryPercentage > 10)
     {
-      tft.print(String(batteryPercentage) + "%");
+      //dd      tft.print(String(batteryPercentage) + "%");
+      tft.print(String(batteryPercentage) + " v");
     }
     else
     {
-      tft.print("LO!");
+      //dd      tft.print("LO!");
+      tft.print(String(batteryPercentage) + " v");
     }
 
     if (showBatteryVoltage)
@@ -415,9 +427,9 @@ void displayBatteryVoltage(bool forceUpdate)
 }
 
 /**
- * Check whether the device should be put to sleep and put it to sleep
- * if it should
- */
+   Check whether the device should be put to sleep and put it to sleep
+   if it should
+*/
 void maybeSleepDevice()
 {
   if (isSleepEnabled && !isPretendSleeping)
@@ -457,8 +469,8 @@ void callback()
 }
 
 /**
- * Awww. Show the go to sleep animation
- */
+   Awww. Show the go to sleep animation
+*/
 void sleepAnimation()
 {
   printSleepAnimationFrame("(o.o)", 500);
@@ -477,8 +489,8 @@ void wakeAnimation()
 }
 
 /**
- * Print the line of the animation
- */
+   Print the line of the animation
+*/
 void printSleepAnimationFrame(String text, int wait)
 {
   tft.fillScreen(TFT_BLACK);
@@ -490,8 +502,8 @@ void printSleepAnimationFrame(String text, int wait)
 }
 
 /**
- * Get the voltage going to the device
- */
+   Get the voltage going to the device
+*/
 float getInputVoltage()
 {
   delay(100);
@@ -500,8 +512,8 @@ float getInputVoltage()
 }
 
 /**
- * Does the device have external or internal power?
- */
+   Does the device have external or internal power?
+*/
 bool isPoweredExternally()
 {
   float inputVoltage = getInputVoltage();
@@ -544,13 +556,13 @@ void makeLNURL()
 }
 
 /*
- * Fills output with nonce, xored payload, and HMAC.
- * XOR is secure for data smaller than the key size (it's basically one-time-pad). For larger data better to use AES.
- * Maximum length of the output in XOR mode is 1+1+nonce_len+1+32+8 = nonce_len+43 = 51 for 8-byte nonce.
- * Payload contains pin, currency byte and amount. Pin and amount are encoded as compact int (varint).
- * Currency byte is '$' for USD cents, 's' for satoshi, 'E' for euro cents.
- * Returns number of bytes written to the output, 0 if error occured.
- */
+   Fills output with nonce, xored payload, and HMAC.
+   XOR is secure for data smaller than the key size (it's basically one-time-pad). For larger data better to use AES.
+   Maximum length of the output in XOR mode is 1+1+nonce_len+1+32+8 = nonce_len+43 = 51 for 8-byte nonce.
+   Payload contains pin, currency byte and amount. Pin and amount are encoded as compact int (varint).
+   Currency byte is '$' for USD cents, 's' for satoshi, 'E' for euro cents.
+   Returns number of bytes written to the output, 0 if error occured.
+*/
 int xor_encrypt(uint8_t *output, size_t outlen, uint8_t *key, size_t keylen, uint8_t *nonce, size_t nonce_len, uint64_t pin, uint64_t amount_in_cents)
 {
   // check we have space for all the data:
