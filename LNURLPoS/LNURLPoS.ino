@@ -10,7 +10,7 @@
 #include <WiFi.h>
 #include "esp_adc_cal.h"
 
-//Dario's version 0.1
+//Dario's version 0.02
 
 ////////////////////////////////////////////////////////
 ////////CHANGE! USE LNURLPoS EXTENSION IN LNBITS////////
@@ -420,7 +420,7 @@ void displayBatteryVoltage(bool forceUpdate)
     if (showBatteryVoltage)
     {
       tft.setFreeFont(SMALLFONT);
-      tft.setCursor(145, 36);
+      tft.setCursor(145, 30);
       tft.print(String(batteryCurV) + "v");
     }
   }
